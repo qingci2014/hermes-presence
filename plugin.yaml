@@ -1,0 +1,17 @@
+name: hermes-presence
+version: 0.1.3
+description: Time awareness, proactive care and source-backed personal continuity. Requires gateway bridge v1; Feishu private chats.
+kind: standalone
+license: MIT
+provides_tools:
+  - temporal_commitment
+config_schema:
+  execution_environment_tag:
+    type: string
+    description: Optional comparison group; change after major provider, reasoning or hardware changes to start fresh timing samples.
+  timezone:
+    type: string
+    description: Optional IANA user timezone; defaults to the active Hermes timezone.
+  temporal:
+    type: object
+    description: Presence timing and contact policy; defaults enabled on a fresh install.
