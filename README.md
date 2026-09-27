@@ -1,7 +1,10 @@
-# Hermes Presence 0.1.3 — experimental, bridge-required
+# Hermes Presence — experimental, bridge-required
 
-Source-only publication of a conversation-continuity experiment for Hermes Agent.
-**Not a stock Hermes plugin installation. Not approved for the Hermes plugin catalog.**
+**Agent 会主动给你发消息，问问你之前无意中提过的事，或那些进行到一半、还没有结果的任务。**
+
+An agent can reach out on its own about something you mentioned in passing or a task you left half-finished—without requiring a formal reminder request. Presence stores source-backed context, revisits it later, and may choose to contact you when it has a worthwhile reason. It can also remain silent; you can pause or cancel a follow-up. This is the intended behavior, not a guarantee of judgment or delivery in every case.
+
+**Experimental source only. Not a stock Hermes plugin installation or an approved catalog entry.** The public `main` branch now contains the local 0.1.4 plugin source (timezone and topic/care changes). The `v0.1.3-experimental.1` prerelease tag remains the original 0.1.3 snapshot; it has not been rewritten.
 
 ## Compatibility
 
@@ -17,7 +20,13 @@ installer, host snapshots, personal migration archives, or local environment fil
 There is no supported installation command for unmodified upstream Hermes here.
 Do not overwrite newer Hermes source files with an older bridge. Developers with
 an independently reviewed compatible bridge may use this source; everyone else
-should treat this release as code for inspection, not a working integration.
+should treat this repository as code for inspection, not a working integration.
+
+## What's new in the 0.1.4 source on `main`
+
+- Resolves a valid IANA timezone for conversation context: explicit plugin setting, effective Hermes setting, then the host timezone (`TZ`, Linux zoneinfo links or `/etc/timezone`, and optional `tzlocal`). Ambiguous abbreviations are not guessed; an unknown zone is reported as `Etc/UTC`. This reads settings only and does not change the system clock.
+- A source-backed `topic_update` now requires a `care_decision` (`create` or `skip`) and a reason. When creating care, it stores the topic and follow-up draft in one transaction; failed writes roll back together, and repeated calls for the same development do not create another draft. A draft still needs a verified response-delivery receipt before it becomes active.
+- Adds literal topic keyword lookup. The normal conversation model still judges whether an event is worth revisiting and when; these changes do not guarantee its judgment.
 
 ## What the implementation does
 
@@ -51,13 +60,12 @@ not a security boundary against malicious in-process plugins.
 python -m unittest discover -s tests -v
 ```
 
-The included synthetic tests verify unsupported-host behavior, registration
-contracts and isolated storage only. They do not prove proactive contact was
+The included 13 isolated tests verify unsupported-host behavior, registration
+contracts, timezone selection and atomic topic/care storage. They do not prove proactive contact was
 sent or received, model decision quality, delivery reliability, or long-term
 stability. No live conversations or personal database are used by these tests.
 See `docs/COMPATIBILITY.md` for missing host contracts and admission blockers.
 
 ## License
 
-MIT; the included upstream copyright notice is preserved. This publication
-retains the 0.1.3 runtime source without pretending it is a newer implementation.
+MIT; the included upstream copyright notice is preserved. The original 0.1.3 prerelease tag remains unchanged; `main` publishes the current local 0.1.4 plugin source without its host bridge, runtime data or private configuration.

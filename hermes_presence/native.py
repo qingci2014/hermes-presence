@@ -181,9 +181,9 @@ class NativeGateway:
         from .time_context import conversation_time
         page['conversation_time'] = await asyncio.to_thread(
             conversation_time, self.app.store, turn.scope, turn.event_id)
-        from hermes_time import get_timezone_name
+        from .timezone_context import context_timezone
         turn = replace(turn, context_json=dumps({'temporal': {'now_utc': iso_time(time.time()),
-            'timezone': self.app.ctx.get_config('timezone', None) or get_timezone_name(), 'conversation_enabled': bool(conv['enabled']),
+            'timezone': context_timezone(self.app.ctx.get_config('timezone', None)), 'conversation_enabled': bool(conv['enabled']),
             'mode': self.app.policy.mode, **page}}))
         event._presence_turn = turn
         return turn

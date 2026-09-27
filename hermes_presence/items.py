@@ -14,7 +14,7 @@ class TemporalItemsMixin:
     def temporal_create_draft(self, scope, *, key, summary, awaited_event, owner,
                               review_after_seconds, turn_id, handoff_id, activity_version,
                               policy_version, expected_after_seconds=None, external_reference=None,
-                              purpose="progress", quoted_text=None, event_id=None, topic_key=None, now=None):
+                              purpose="progress", quoted_text=None, event_id=None, topic_key=None, now=None, _conn=None):
         now = time.time() if now is None else now
         key = item_key(key)
         summary = text_field(summary, "summary", 500)
@@ -93,7 +93,7 @@ class TemporalItemsMixin:
                 topic_body['last_care_seq'] = topic_body['source_seq']
                 conn.execute(f'UPDATE temporal_topics SET body_json=? WHERE {SCOPE} AND topic_key=?', (dumps(topic_body), *scope.sql, topic_key))
             return item(conn, scope, key)
-        return self._execute_write(write)
+        return write(_conn) if _conn is not None else self._execute_write(write)
 
     def temporal_list_items(self, scope, *, offset=0, limit=20, include_terminal=False):
         if type(offset) is not int or offset < 0 or type(limit) is not int or not 1 <= limit <= 20:

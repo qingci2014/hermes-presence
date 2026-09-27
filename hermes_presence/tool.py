@@ -17,6 +17,8 @@ TEMPORAL_SCHEMA = {
             "outcome": {"type": "string", "enum": ["completed", "failed", "cancelled", "waiting"]},
             "evidence_quote": {"type": "string", "maxLength": 400, "description": "Exact successful tool-result quote AFTER work_start."},
             "topic_key": {"type": "string", "description": "Stable life-topic key."},
+            "care_decision": {"type": "string", "enum": ["create", "skip"], "description": "Required for topic_update; create atomically adds care, skip records why not."},
+            "care_reason": {"type": "string", "maxLength": 500, "description": "Required for topic_update: why future contact is worthwhile or unnecessary."},
             "topic_status": {"type": "string", "enum": ["active", "paused", "closed"], "description": "Omit to keep status; close requires evidence."},
             "kind": {"type": "string", "enum": ["preference", "view", "relationship"]},
             "content": {"type": "string", "maxLength": 500},
@@ -25,7 +27,7 @@ TEMPORAL_SCHEMA = {
             "previous_id": {"type": "string", "description": "Record explicitly corrected by user."},
             "purpose": {"type": "string", "enum": ["progress", "care"], "description": "care: optional contact, one attempt, no deadline."},
             "record_id": {"type": "string"},
-            "query": {"type": "string", "description": "Literal keyword; omit for recent records."},
+            "query": {"type": "string", "description": "Literal keyword for recall/topics; omit for recent entries."},
             "include_history": {"type": "boolean"},
             "use_for_followup": {"type": "boolean", "description": "Explicit contact preference, not send permission."},
             "key": {"type": "string"}, "summary": {"type": "string"}, "awaited_event": {"type": "string"},
@@ -43,8 +45,8 @@ _FIELDS = {
     "work_history": {"task_type"},
     "work_start": {"task_type", "criteria", "predicted_seconds"},
     "work_finish": {"outcome", "evidence_quote"},
-    "topics": {"topic_key", "limit"},
-    "topic_update": {"topic_key", "summary", "quoted_text", "topic_status"},
+    "topics": {"topic_key", "query", "limit"},
+    "topic_update": {"topic_key", "summary", "quoted_text", "topic_status", "care_decision", "care_reason", "review_after_seconds", "awaited_event"},
     "remember": {"kind", "content", "quoted_text", "epistemic_status", "previous_id", "use_for_followup"},
     "recall": {"query", "kind", "include_history", "limit", "record_id"}, "forget": {"record_id"},
     "create": {"key", "summary", "awaited_event", "owner", "review_after_seconds", "expected_after_seconds", "process_id", "purpose", "quoted_text", "topic_key"},
@@ -77,8 +79,16 @@ def temporal_tool(args, *, turn=None, process_reference=None):
         elif action == "topics":
             result = {"topics": [topic_view(t) for t in db.temporal_topics(scope, **kwargs)]}
         elif action == "topic_update":
-            result = {"topic": db.temporal_update_topic(scope, **kwargs, event_id=turn.event_id,
-                expected_activity=turn.activity_version, expected_policy=turn.policy_version, resume_authorized=turn.resume_authorized)}
+            required = {'topic_key', 'summary', 'quoted_text', 'care_decision', 'care_reason'}
+            if not required <= kwargs.keys():
+                raise TemporalError('topic_update requires topic_key, summary, quoted_text, care_decision=create|skip and care_reason. For create also supply review_after_seconds>=60; no separate create call is needed.')
+            topic, cue = db.temporal_topic_with_care(scope, **kwargs, event_id=turn.event_id,
+                expected_activity=turn.activity_version, expected_policy=turn.policy_version,
+                turn_id=turn.turn_id, handoff_id=turn.handoff_id, resume_authorized=turn.resume_authorized)
+            result = {'topic': topic, 'care_decision': kwargs['care_decision']}
+            if cue:
+                result.update(item=item_view(cue, time.time()), followup_mode=policy_of(conv).mode,
+                    handoff_state=cue['body']['handoff_state'], review_after_seconds=cue['body']['review_after_seconds'])
         elif action == "recall":
             result = {"records": [record_view(r) for r in db.temporal_recall(scope, **kwargs)]}
         elif action in ("remember", "forget"):
@@ -121,7 +131,7 @@ def temporal_tool(args, *, turn=None, process_reference=None):
             result['record'] = {k: result['record'][k] for k in ('record_id', 'status', 'kind', 'previous_id')}
         elif action == 'topic_update':
             result['topic'] = {k: result['topic'][k] for k in ('topic_key', 'status', 'updated_at')}
-        elif 'item' in result:
+        if 'item' in result:
             result['item'] = {k: result['item'][k] for k in ('key', 'revision', 'status', 'review_at', 'expected_by', 'reason')}
         return json.dumps({"success": True, **result}, ensure_ascii=False, separators=(',', ':'))
     except (TemporalError, TypeError) as exc:

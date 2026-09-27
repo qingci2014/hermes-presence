@@ -4,15 +4,22 @@ from .tool import TEMPORAL_SCHEMA
 
 _GUIDANCE = '''Presence: use temporal_commitment for continuity during normal replies.
 Notice meaningful life developments without requiring a reminder request. Retrieve
-related topics, then topic_update with a stable topic_key and exact CURRENT user
-quoted_text. Keep summaries faithful. Ordinary chatter needs no record. Resume
+related topics (topics accepts query), then topic_update with a stable topic_key,
+exact CURRENT user quoted_text, care_decision=create|skip and care_reason. Every
+topic update must make this decision; success=create includes the care draft in
+the SAME call. Ordinary chatter needs no record; if updating without worthwhile
+future contact, choose skip and explain why. Keep summaries faithful. Resume
 paused topics only when invited; close only with outcome evidence. Silence proves
 neither completion, failure nor disinterest.
 
-Create purpose=care only for a worthwhile future conversation: first update its
-topic; set owner=user, topic_key, quoted_text and a sensible review_after_seconds;
-omit expected_after_seconds. summary explains why revisiting matters; awaited_event
-is optional sharing. Unclear timing: keep listening, no cue. One development, one
+For a concrete upcoming personal milestone with emotional stakes (e.g. a stressful
+interview or long-awaited reward on Monday), normally choose care_decision=create
+unless contact is unwanted or adds no value. No reminder request is needed. Supply
+a sensible review_after_seconds for a conservative window around/after the event,
+using current date and timezone; a missing exact hour alone is not unclear timing.
+care_reason explains why revisiting matters; awaited_event is optional sharing.
+No meaningful future contact or genuinely unclear timing: skip, keep listening.
+Do not call create again after topic_update already created care. One development, one
 opportunity; silence creates no new ones. Speak naturally, without countdowns or
 asking the user to schedule concern. Honor stop/pause; unavailable/disabled means no
 contact. Drafts arm only after confirmed delivery; never claim unconfirmed scheduling.
