@@ -1,6 +1,6 @@
 # Hermes Presence — experimental, bridge-required
 
-**Agent 会主动给你发消息，问问你之前无意中提过的事，或那些进行到一半、还没有结果的任务。**
+**Agent 现在会主动给你发信息，问问之前你无意中提过的事、一些进行到一半未完结的任务。**
 
 An agent can reach out on its own about something you mentioned in passing or a task you left half-finished—without requiring a formal reminder request. Presence stores source-backed context, revisits it later, and may choose to contact you when it has a worthwhile reason. It can also remain silent; you can pause or cancel a follow-up. This is the intended behavior, not a guarantee of judgment or delivery in every case.
 
