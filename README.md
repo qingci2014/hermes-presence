@@ -1,8 +1,8 @@
 # Hermes Presence — experimental, bridge-required
 
-**Agent 现在会主动给你发信息，问问之前你无意中提过的事、一些进行到一半未完结的任务。**
+**An agent can proactively message you to ask about something you mentioned in passing or a task you left half-finished.**
 
-An agent can reach out on its own about something you mentioned in passing or a task you left half-finished—without requiring a formal reminder request. Presence stores source-backed context, revisits it later, and may choose to contact you when it has a worthwhile reason. It can also remain silent; you can pause or cancel a follow-up. This is the intended behavior, not a guarantee of judgment or delivery in every case.
+Presence stores source-backed context, revisits it later, and may choose to contact you when it has a worthwhile reason—even if you never made a formal reminder request. It can also remain silent; you can pause or cancel a follow-up. This is the intended behavior, not a guarantee of judgment or delivery in every case.
 
 **Experimental source only. Not a stock Hermes plugin installation or an approved catalog entry.** The public `main` branch now contains the local 0.1.4 plugin source (timezone and topic/care changes). The `v0.1.3-experimental.1` prerelease tag remains the original 0.1.3 snapshot; it has not been rewritten.
 
