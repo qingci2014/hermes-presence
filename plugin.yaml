@@ -1,5 +1,5 @@
 name: hermes-presence
-version: 0.1.4
+version: 0.1.5
 description: Time awareness, proactive care and source-backed personal continuity. Requires gateway bridge v1; Feishu private chats.
 kind: standalone
 license: MIT

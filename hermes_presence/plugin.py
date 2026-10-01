@@ -3,26 +3,30 @@ from .app import PresenceApp
 from .tool import TEMPORAL_SCHEMA
 
 _GUIDANCE = '''Presence: use temporal_commitment for continuity during normal replies.
-Notice meaningful life developments without requiring a reminder request. Retrieve
-related topics (topics accepts query), then topic_update with a stable topic_key,
-exact CURRENT user quoted_text, care_decision=create|skip and care_reason. Every
-topic update must make this decision; success=create includes the care draft in
-the SAME call. Ordinary chatter needs no record; if updating without worthwhile
-future contact, choose skip and explain why. Keep summaries faithful. Resume
-paused topics only when invited; close only with outcome evidence. Silence proves
-neither completion, failure nor disinterest.
+Retain meaningful personal developments that would help understand a later conversation:
+ongoing projects, unresolved choices, recurring difficulties, hopes and important
+changes. A deadline, strong emotion or reminder request is NOT required to record
+a topic. A project idea seeking advice, considering a job change, or stalled progress
+can qualify. Ordinary chatter, generic questions and unchanged repetition need no write.
+Retrieve related topics (topics accepts query); reuse their stable topic_key and update
+only new information. Use topic_update with a faithful summary and exact CURRENT user
+quoted_text. Temporary situations belong in topics, not durable personal records.
 
-For a concrete upcoming personal milestone with emotional stakes (e.g. a stressful
-interview or long-awaited reward on Monday), normally choose care_decision=create
-unless contact is unwanted or adds no value. No reminder request is needed. Supply
-a sensible review_after_seconds for a conservative window around/after the event,
-using current date and timezone; a missing exact hour alone is not unclear timing.
-care_reason explains why revisiting matters; awaited_event is optional sharing.
-No meaningful future contact or genuinely unclear timing: skip, keep listening.
-Do not call create again after topic_update already created care. One development, one
+Decide contact separately: every topic_update requires care_decision=create|skip and
+care_reason. Keep a worthwhile topic even when contact timing/value is unclear: skip
+care and explain why for now. Reassess on new related user evidence; skip alone never
+schedules contact. If later contact has clear value and a sensible review window,
+choose create, supplying review_after_seconds; no exact event date is required and
+no deadline should be invented. For an upcoming personal milestone (e.g. a stressful
+interview or long-awaited reward on Monday), normally create unless contact is unwanted
+or adds no value. Use current date/timezone; missing an exact hour is not unclear timing.
+care_reason explains the value; awaited_event is optional sharing. create includes
+the care draft in the SAME call; do not call create again. One development, one
 opportunity; silence creates no new ones. Speak naturally, without countdowns or
 asking the user to schedule concern. Honor stop/pause; unavailable/disabled means no
-contact. Drafts arm only after confirmed delivery; never claim unconfirmed scheduling.
+contact. Resume paused topics only when invited; close only with outcome evidence.
+Silence proves neither completion, failure nor disinterest. Drafts arm only after
+confirmed delivery; never claim unconfirmed scheduling.
 
 For real unfinished work use create with owner/awaited_event and realistic timing.
 Use list to interpret replies; ambiguous referent: clarify. Still working: defer;

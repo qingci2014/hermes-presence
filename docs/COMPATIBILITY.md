@@ -21,6 +21,14 @@ NousResearch/hermes-agent commit `64ea66b03d44ead9ffea48161132e5deca5d255a`:
 
 ## Tests actually run
 
+For the 0.1.5 source publication, `python3 -B -m unittest discover -s tests -v`:
+**16 tests passed**. The added cases verify that undated ongoing topics can survive
+a session reset without scheduled contact or personal-memory writes, then gain a
+care draft from fresh evidence. Delivery confirmation is still required to arm it.
+These scripted calls do not measure real-model selection quality.
+
+### Historical initial publication checks
+
 `python3 -B -m unittest discover -s tests -v`: **4 tests passed**. These are
 synthetic isolated registration/storage/parse checks, not live delivery tests.
 
